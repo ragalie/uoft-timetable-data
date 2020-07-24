@@ -21,13 +21,23 @@ def put_into_rows(body)
     lectures = details['meetings'].select do |_, detail|
       detail['teachingMethod'] == 'LEC' &&
         detail['enrollmentCapacity'] &&
-        detail['enrollmentCapacity'] != '9999' &&
-        detail['enrollmentControls'] &&
-        detail['enrollmentControls'].any? { |control| control['yearOfStudy'] == '1' }
+        detail['enrollmentCapacity'] != '9999'
     end
 
     lectures.each do |_, details|
       lecture_info = course_info.merge(details.slice('enrollmentCapacity', 'actualEnrolment', 'deliveryMode'))
+
+      enrollmentControls = details['enrollmentControls'] && details['enrollmentControls'].map { |c| c['yearOfStudy'] } || []
+      enrollmentControls.sort! do |a, b|
+        next 0 if a == b
+        next 1 if a == '*'
+        next -1 if b == '*'
+
+        a < b ? -1 : 1
+      end
+
+      lecture_info['enrollmentControls'] = enrollmentControls.first
+
       rows << lecture_info
     end
   end
@@ -50,7 +60,7 @@ DEPARTMENTS.each do |department|
   puts "Retrieving info for #{department}"
 
   lectures_for_department = retrieve_course_info(department)
-  puts "- Found #{lectures_for_department.length} year 1 lectures"
+  puts "- Found #{lectures_for_department.length} lectures"
 
   all_rows += lectures_for_department
 end
