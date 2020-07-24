@@ -37,7 +37,7 @@ end
 
 def write_to_csv(rows)
   columns = rows[0].keys
-  CSV.open("uoft-first-year-data-#{Date.today}.csv", "w") do |csv|
+  CSV.open("data/uoft-first-year-data-#{Date.today}.csv", "w") do |csv|
     csv << columns
     rows.each do |row|
       csv << row.values_at(*columns)
