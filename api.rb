@@ -19,13 +19,12 @@ def put_into_rows(body)
     course_info = details.slice('code', 'org', 'section')
 
     lectures = details['meetings'].select do |_, detail|
-      detail['teachingMethod'] == 'LEC' &&
-        detail['enrollmentCapacity'] &&
+      detail['enrollmentCapacity'] &&
         detail['enrollmentCapacity'] != '9999'
     end
 
     lectures.each do |_, details|
-      lecture_info = course_info.merge(details.slice('enrollmentCapacity', 'actualEnrolment', 'deliveryMode'))
+      lecture_info = course_info.merge(details.slice('enrollmentCapacity', 'actualEnrolment', 'deliveryMode', 'teachingMethod'))
 
       enrollmentControls = details['enrollmentControls'] && details['enrollmentControls'].map { |c| c['yearOfStudy'] } || []
       enrollmentControls.sort! do |a, b|
